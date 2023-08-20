@@ -1,7 +1,5 @@
 # Hinterview - AI Interview Assistant
 
-Hinterview is a powerful tool designed to transcribe, process, and provide insights for interview-related queries using OpenAI's capabilities.
-
 ## Features
 
 - Audio Transcription with Whisper ASR: Quickly transcribe interview audio segments in real-time using OpenAI's powerful Whisper ASR system.
