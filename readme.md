@@ -1,6 +1,6 @@
-# Interview Assistant
+# Hinterview - AI Interview Assistant
 
-Interview Assistant is a powerful tool designed to transcribe, process, and provide insights for interview-related queries using OpenAI's capabilities.
+Hinterview is a powerful tool designed to transcribe, process, and provide insights for interview-related queries using OpenAI's capabilities.
 
 ## Features
 
@@ -20,8 +20,8 @@ Interview Assistant is a powerful tool designed to transcribe, process, and prov
 Clone the Repository:
 
 ```bash
-git clone https://github.com/rawcsav/Interview_Assistant.git
-cd Interview_Assistant
+git clone https://github.com/rawcsav/Hinterview.git
+cd Hinterview
 ```
 
 Install Dependencies:
