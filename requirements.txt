@@ -1,0 +1,9 @@
+tiktoken==0.4.0
+pyaudio==0.2.13
+pydub==0.25.1
+pynput==1.7.6
+colorama==0.4.6
+openai==0.27.8
+pandas==2.0.3
+scipy==1.11.2
+tqdm==4.66.1
