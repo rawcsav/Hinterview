@@ -3,6 +3,7 @@ import os
 import re
 import time
 import warnings
+from contextlib import asynccontextmanager
 from typing import Dict, Tuple, List
 
 import openai
@@ -15,13 +16,43 @@ from tqdm import tqdm
 from config import get_config
 
 EMBEDDING_MODEL = "text-embedding-ada-002"
-GPT_MODEL = "gpt-4"
-MAX_LENGTH = 300
+GPT_MODEL = get_config('gpt_model')
+TEMPERATURE = get_config('temperature')
+MAX_TOKENS = get_config('max_tokens')
+SYSTEM_PROMPT = get_config('system_prompt')
+
+MAX_LENGTH = 200
 TOP_N = 3
 
 tokenizer = tiktoken.get_encoding("cl100k_base")
 warnings.filterwarnings('ignore')
 
+
+def transcribe(audio_filepath) -> str:
+    try:
+        transcript = openai.Audio.transcribe(
+            file=open(audio_filepath, "rb"),
+            model="whisper-1",
+            prompt="This is an audio recording of a professional, personable, and fluid conversation.",
+        )
+        return transcript["text"]
+    except openai.error.OpenAIError as api_err:
+        print(Style.BRIGHT + Fore.RED + "API Error:", api_err)
+    except Exception as e:
+        print(Style.BRIGHT + Fore.RED + "Error:", e)
+    return ""
+
+
+def remove_non_ascii(text: str) -> str:
+    return ''.join(i for i in text if ord(i) < 128)
+
+def transcribe_and_clean(mp3_filepath) -> str:
+    transcription = transcribe(mp3_filepath)
+    if transcription:
+        cleaned_transcription = remove_non_ascii(transcription)
+        return cleaned_transcription
+    else:
+        return "Transcription failed. Please try again."
 
 def num_tokens(text: str, model: str = GPT_MODEL) -> int:
     encoding = tiktoken.encoding_for_model(model)
@@ -155,9 +186,9 @@ def query_message(query: str, df: pd.DataFrame) -> str:
     resume_title = get_config('resume_title')
     job_desc_title = get_config('job_desc_title')
 
-    introduction = ('Use the below textual excerpts to answer the subsequent interview question. If the answer cannot '
+    introduction = ('Use the below textual excerpts to answer the subsequent question. If the answer cannot '
                     'be found in the provided text, do your best to provide the most rational and comprehensive '
-                    'answer. Answer as if you are the interviewee.')
+                    'response. Be as succinct as possible.')
     question = query
 
     message = introduction
@@ -193,12 +224,24 @@ def query_message(query: str, df: pd.DataFrame) -> str:
     full_message += question
     return message, full_message, docs_used
 
+@asynccontextmanager
+async def async_chat_completion(*args, **kwargs):
+    chat_completion = await openai.ChatCompletion.acreate(*args, **kwargs)
+    try:
+        yield chat_completion
+    finally:
+        await chat_completion.aclose()
 
-async def ask(transcription, df, model: str = GPT_MODEL) -> str:
+async def ask(transcription, df, interruption_event) -> str:
+    if interruption_event.is_set():
+        return
+
     print(Fore.CYAN + "\n──────────────────────────────────────────────────────────────────────────")
     print(Style.BRIGHT + Fore.BLUE + "Question:" + "\n" + Style.NORMAL + Fore.RESET + f"{transcription}")
     print(Style.BRIGHT + Fore.MAGENTA + "\n" + "AI Response:")
-    max_tokens = 1500
+    max_tokens = MAX_TOKENS
+    temperature = TEMPERATURE
+    model = GPT_MODEL
     max_tokens - num_tokens(transcription, model=model)
 
     message, full_message, docs_used = query_message(transcription, df)
@@ -206,22 +249,35 @@ async def ask(transcription, df, model: str = GPT_MODEL) -> str:
     max_tokens = max_tokens - num_tokens(transcription + full_message, model=model)
     messages = [
         {"role": "system",
-         "content": "You are a knowledgeable job interview assistant that uses information from provided textual "
-                    "excerpts to answer interview questions."},
+         "content": SYSTEM_PROMPT},
         {"role": "user", "content": full_message},
     ]
+
     response_content = ""
-    async for chunk in await openai.ChatCompletion.acreate(
+    async with async_chat_completion(
             model=model,
             messages=messages,
             max_tokens=max_tokens,
-            temperature=.7,
+            temperature=temperature,
             stream=True,
-    ):
-        content = chunk["choices"][0].get("delta", {}).get("content", "")
-        if content is not None:
-            print(content, end='')
-        response_content += content
+    ) as chat_completion:
+        try:
+            async for chunk in chat_completion:
+                # Check for interruption after each response chunk
+                if interruption_event.is_set():
+                    return
+
+                content = chunk["choices"][0].get("delta", {}).get("content", "")
+                if content is not None:
+                    print(content, end='')
+                response_content += content
+
+        except RuntimeError as e:
+            if 'asynchronous generator is already running' in str(e):
+                # This is the error we expect when interrupted.
+                print("Generator was interrupted.")
+            else:
+                raise
 
     print(Fore.CYAN + "\n──────────────────────────────────────────────────────────────────────────")
-    print(Fore.LIGHTGREEN_EX + "\nPress and hold the Option key again to record another segment of your interview.")
+    print(Fore.LIGHTGREEN_EX + "\nPress and hold the hotkey again to record another segment.")
