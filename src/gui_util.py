@@ -15,9 +15,8 @@ def display_intro():
 
 
 def display_instructions():
-    print("\nPress and hold the hotkey to record a segment of your interview.")
+    print("\nPress and hold the hotkey (default: Option) to record a segment of your interview.")
     print("Release the key to stop recording and get insights.")
-    print(Fore.CYAN + "\n──────────────────────────────────────────────────────────────────────────")
 
 
 def display_footer():
@@ -26,6 +25,7 @@ def display_footer():
 
 
 def display_recording():
+    print(Fore.CYAN + "\n──────────────────────────────────────────────────────────────────────────")
     print(Fore.YELLOW + "\n[STATUS] Recording...")
 
 
