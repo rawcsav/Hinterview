@@ -13,7 +13,9 @@ from colorama import Fore, Style
 from scipy import spatial
 from tqdm import tqdm
 
-from config import get_config
+from config import configure_gpt_settings, get_config
+
+configure_gpt_settings()
 
 EMBEDDING_MODEL = "text-embedding-ada-002"
 GPT_MODEL = get_config('gpt_model')
@@ -233,6 +235,7 @@ async def async_chat_completion(*args, **kwargs):
         await chat_completion.aclose()
 
 async def ask(transcription, df, interruption_event) -> str:
+
     if interruption_event.is_set():
         return
 
