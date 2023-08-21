@@ -34,12 +34,16 @@ Create a config.ini in the root directory of the project. Add the following:
 
 ```ini
 [SETTINGS]
-folder_path = YOUR_FOLDER_PATH
-openai_api_key = YOUR_OPENAI_API_KEY
-hotkey = YOUR_PREFERRED_HOTKEY
+folder_path = /path/to/your/folder
+openai_api_key = your_openai_api_key
+hotkey = your_preferred_hotkey
 special_option = True or False
-resume_path = YOUR_RESUME_PATH (if special_option = True)
-job_description_path = YOUR_JOB_DESCRIPTION_PATH (if special_option = True)
+gpt_model = gpt-4
+system_prompt = You are a knowledgeable job interview assistant that uses information from provided textual excerpts to provide impressive, but concise answers to interview questions.
+temperature = 0.5
+max_tokens = 1000
+resume_title = resume
+job_desc_title = description
 ```
 
 Run the Application:
