@@ -188,9 +188,10 @@ def query_message(query: str, df: pd.DataFrame) -> str:
     resume_title = get_config('resume_title')
     job_desc_title = get_config('job_desc_title')
 
-    introduction = ('Use the below textual excerpts to answer the subsequent question. If the answer cannot '
-                    'be found in the provided text, do your best to provide the most rational and comprehensive '
-                    'response. Be as succinct as possible.')
+    introduction = ('Use the textual excerpts to provide detailed, bullet point answers for the subsequent question. '
+                    'If the answer cannot be found in the provided text, do your best to provide the most rational and  '
+                    'comprehensive response. The response should be able to be seamlessly used to quickly answer the question.'
+                    'Be as succinct as possible.')
     question = query
 
     message = introduction
