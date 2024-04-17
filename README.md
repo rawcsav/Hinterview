@@ -52,7 +52,7 @@ python src/main.py
 
 ## Usage
 
-- Start the Application: Run `python main.py`.
+- Start the Application: Run `python src/main.py`.
 - Follow On-screen Instructions: The CLI will guide you on how to record, transcribe, and obtain insights for your interviews.
 - Hotkey Driven: The application uses a hotkey (configurable) for starting and stopping audio recording. Once recording is stopped, the audio segment is transcribed and analyzed.
 - Adjust Settings as Needed: The config.py script facilitates the configuration of various settings including the OpenAI API key, folder paths, hotkeys, and more. If the config.ini file is missing or incomplete, the user is prompted to provide necessary details.
