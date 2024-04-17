@@ -5,7 +5,7 @@
 - Audio Transcription with Whisper ASR: Quickly transcribe interview audio segments in real-time using OpenAI's powerful Whisper ASR system.
 - Interactive CLI: An intuitive command-line interface designed with colorama for colored feedback, providing visual cues for recording, transcribing, and AI response statuses.
 - Real-time Insights with OpenAI: Transcribed segments are analyzed by OpenAI to provide insights and responses. Embeds documents for a more contextual understanding of interview questions.
-- Configurable Settings: A flexible configuration system utilizing configparser allows users to adjust settings for directory paths, OpenAI API keys, and preferred hotkeys. The special interview option (`special_option`) facilitates the use of resume and job description documents for enhanced insights.
+- Configurable Settings: A flexible configuration system utilizing configparser allows users to adjust settings for directory paths, OpenAI API keys, and preferred hotkeys. 
 
 ## Prerequisites
 
@@ -30,26 +30,24 @@ pip install -r requirements.txt
 
 Set Up Configuration:
 
-Create a config.ini in the root directory of the project. Add the following:
+Create a config.ini in the root directory of the project. Add/configure the following:
 
 ```ini
 [SETTINGS]
 folder_path = /path/to/your/folder
 openai_api_key = your_openai_api_key
 hotkey = your_preferred_hotkey
-special_option = True or False
-gpt_model = gpt-4
+gpt_model = gpt-4-turbo
 system_prompt = You are a knowledgeable job interview assistant that uses information from provided textual excerpts to provide impressive, but concise answers to interview questions.
-temperature = 0.5
+temperature = 1.0
+top_p= 1.0
 max_tokens = 1000
-resume_title = resume
-job_desc_title = description
 ```
 
 Run the Application:
 
 ```bash
-python main.py
+python src/main.py
 ```
 
 ## Usage
@@ -58,11 +56,12 @@ python main.py
 - Follow On-screen Instructions: The CLI will guide you on how to record, transcribe, and obtain insights for your interviews.
 - Hotkey Driven: The application uses a hotkey (configurable) for starting and stopping audio recording. Once recording is stopped, the audio segment is transcribed and analyzed.
 - Adjust Settings as Needed: The config.py script facilitates the configuration of various settings including the OpenAI API key, folder paths, hotkeys, and more. If the config.ini file is missing or incomplete, the user is prompted to provide necessary details.
-- Special Interview Option: When `special_option` is set to True in the config.ini file, you can specify the paths for your resume and the job description by setting `resume_path` and `job_description_path`. The application will include at least one excerpt from each of these documents when providing AI-generated responses to interview questions, ensuring a more personalized and tailored response.
+
 
 ## MacOS Configuration
 
-This project was developed and tested on MacOS. For capturing audio, it's designed to use BlackHole as a virtual microphone. Audio is captured at a rate of 44100Hz in stereo format. Audio segments are temporarily saved as MP3 files for transcription. You can set up BlackHole by creating a multi-output device in the Audio MIDI settings.
+This project was developed and tested on MacOS. For capturing audio, it's designed to use BlackHole as a virtual microphone. Audio is captured at a rate of 44100Hz in stereo format. Audio segments are temporarily saved as MP3 files for transcription. 
+`Important:` You need to set up BlackHole by creating a multi-output device in the Audio MIDI settings. Otherwise you will not be able to hear and capture the audio simultaneously.
 
 ## Acknowledgements
 

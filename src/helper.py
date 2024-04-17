@@ -11,7 +11,7 @@ from openai_util import transcribe_and_clean, ask
 
 init(autoreset=True)
 
-df = primary_gui()
+titles, locs, texts, embeddings = primary_gui()
 
 HOTKEY = get_config("hotkey")
 FOLDER_PATH = get_config("folder_path")
@@ -28,7 +28,6 @@ recording_event = threading.Event()
 interruption_event = threading.Event()
 
 def record_audio():
-
     frames = []
     display_recording()
 
@@ -58,11 +57,13 @@ def record_audio():
         if transcription_result != "Transcription failed. Please try again.":
             if not interruption_event.is_set():  # Only process if not interrupted
                 display_processing()
-                asyncio.run(ask(transcription_result, df, interruption_event))
+                asyncio.run(ask(transcription_result, titles, locs, texts, embeddings, interruption_event))
         else:
             print(Fore.RED + transcription_result)
-    finally:  # Display the error message
+    finally:
         frames.clear()
+
+
 
 def on_press(key):
     if key == getattr(keyboard.Key, HOTKEY) and not recording_event.is_set():
